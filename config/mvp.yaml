@@ -1,0 +1,20 @@
+repo:
+  url: "https://github.com/juliocanelon/java-app-test-agent"
+  branch: "main"
+  fix_branch_prefix: "fix/ai"
+vulns:
+  csv_path: "data/checkmarx.csv"
+  severities: ["High","Medium"]
+policy:
+  skip_non_exploitable: true
+  max_attempts: 2
+verify:
+  tests_cmd: "mvn -q -DskipTests=false test"
+  fallback_cmd: "mvn -q -DskipTests=true package"
+commanding:
+  mode: "STUB"             # opciones: STUB | DOCKER_GEMINI
+  docker_image: "gemini-cli:latest"
+  instruction_md: "data/instruction.md"
+  diff_format: "unified-diff"
+logging:
+  level: "INFO"
