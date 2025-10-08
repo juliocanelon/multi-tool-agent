@@ -1,0 +1,3 @@
+Project,File,Line,Severity,Query,Description,Remediation
+core-service,src/main/java/com/example/App.java,42,High,SQL Injection,"User input is concatenated into SQL query","Use prepared statements to parameterize queries"
+core-service,src/main/java/com/example/Utils.java,10,Medium,Null Dereference,"Potential null pointer access","Add null checks before dereferencing"

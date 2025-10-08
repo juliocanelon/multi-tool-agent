@@ -1,0 +1,15 @@
+checkmarx_csv: ../data/checkmarx.csv
+instruction_path: ../instruction.md
+commanding:
+  provider: stub
+  stub_diff_path: null
+repo:
+  path: ..
+  base_branch: main
+  branch_prefix: fix/checkmarx
+  push: false
+  create_pr: false
+verification:
+  enabled: false
+  command: mvn test
+  working_directory: ..
