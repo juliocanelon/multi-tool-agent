@@ -28,19 +28,21 @@ class Orchestrator:
         }
         intent = self.intention.run(user_text, env_defaults)
 
-        # C3: clonar/actualizar repo
         repo_log = self.repo.clone_or_update(intent.repo_url or env_defaults["DEFAULT_REPO_URL"],
                                              intent.branch or env_defaults["DEFAULT_BRANCH"])
 
-        instruction = self.research.build_instruction(intent)
+        findings = self.research.collect_findings(intent)
+        instruction = self.research.build_instruction(intent, findings)
         (self.data_dir/"instruction.md").write_text(instruction, encoding="utf-8")
-        result = self.command.dry_run(instruction)
-        ver = self.verifyer.verify()
 
+        # NUEVO: aplicar fix naive sobre el repo clonado en workdir
+        fix = self.command.apply_naive_fix(findings, repo_root=self.workdir)
+
+        ver = self.verifyer.verify()
         return {
             "intention": intent.model_dump(),
             "repo": repo_log,
-            "result": result,
+            "fix": fix,
             "verify": ver,
             "instruction_path": str(self.data_dir/"instruction.md"),
             "workdir": str(self.workdir),
