@@ -1,8 +1,8 @@
 # Instrucción para coding agent
-Repo: https://git/repo.git
-Branch: master
+Repo: https://github.com/juliocanelon/java-app-test-agent
+Branch: main
 Checkmarx Project: 
-Severidades objetivo: CRITICAL, HIGH
+Severidades objetivo: HIGH
 
 ## Hallazgos prioritarios (resumen del CSV)
 

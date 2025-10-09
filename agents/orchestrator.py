@@ -6,11 +6,9 @@ from .intention_agent import IntentionAgent
 from .scan_research_agent import ScanResearchAgent
 from .commanding_agent import CommandingAgent
 from .verify_agent import VerifyAgent
+from .repo_agent import RepoAgent
 
 class Orchestrator:
-    """
-    Flujo MVP: intención -> research(csv) -> instruction.md -> dry_run -> verify
-    """
     def __init__(self, base_dir:Path):
         load_dotenv(base_dir/".env")
         self.base_dir = base_dir
@@ -21,6 +19,7 @@ class Orchestrator:
         self.research  = ScanResearchAgent(self.data_dir)
         self.command   = CommandingAgent(self.workdir)
         self.verifyer  = VerifyAgent(self.workdir)
+        self.repo      = RepoAgent(self.workdir)
 
     def handle(self, user_text:str) -> dict:
         env_defaults = {
@@ -28,13 +27,19 @@ class Orchestrator:
             "DEFAULT_BRANCH": os.getenv("DEFAULT_BRANCH","main"),
         }
         intent = self.intention.run(user_text, env_defaults)
+
+        # C3: clonar/actualizar repo
+        repo_log = self.repo.clone_or_update(intent.repo_url or env_defaults["DEFAULT_REPO_URL"],
+                                             intent.branch or env_defaults["DEFAULT_BRANCH"])
+
         instruction = self.research.build_instruction(intent)
-        # Persistimos la instrucción ‘oficial’ en data/instruction.md además de workdir
         (self.data_dir/"instruction.md").write_text(instruction, encoding="utf-8")
         result = self.command.dry_run(instruction)
         ver = self.verifyer.verify()
+
         return {
             "intention": intent.model_dump(),
+            "repo": repo_log,
             "result": result,
             "verify": ver,
             "instruction_path": str(self.data_dir/"instruction.md"),
