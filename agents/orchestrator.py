@@ -32,11 +32,20 @@ class Orchestrator:
                                              intent.branch or env_defaults["DEFAULT_BRANCH"])
 
         findings = self.research.collect_findings(intent)
+        # Export findings para el contenedor
+        findings_json = self.data_dir / "findings.json"
+        self.research.dump_findings_json(findings, findings_json)
+
         instruction = self.research.build_instruction(intent, findings)
         (self.data_dir/"instruction.md").write_text(instruction, encoding="utf-8")
 
-        # NUEVO: aplicar fix naive sobre el repo clonado en workdir
-        fix = self.command.apply_naive_fix(findings, repo_root=self.workdir)
+        use_docker = True  # ← cambia a False si quieres seguir local
+        if use_docker:
+            # Asegúrate de haber construido la imagen primero
+            docker_image = os.getenv("CODE_FIX_IMAGE", "code-fix-cli:latest")
+            fix = self.command.run_in_docker(docker_image, workdir=self.workdir, data_dir=self.data_dir)
+        else:
+            fix = self.command.apply_naive_fix(findings, repo_root=self.workdir)
 
         ver = self.verifyer.verify()
         return {
@@ -45,5 +54,7 @@ class Orchestrator:
             "fix": fix,
             "verify": ver,
             "instruction_path": str(self.data_dir/"instruction.md"),
+            "findings_json": str(findings_json),
             "workdir": str(self.workdir),
         }
+

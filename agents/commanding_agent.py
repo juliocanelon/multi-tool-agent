@@ -1,3 +1,4 @@
+import subprocess, shlex, os
 from pathlib import Path
 
 def _comment_prefix(path: Path) -> str:
@@ -72,3 +73,36 @@ class CommandingAgent:
             f"NAIVE_FIX: changed={len(changed)} skipped={len(skipped)}", encoding="utf-8"
         )
         return {"status":"NAIVE_OK", "changed": len(changed), "skipped": skipped}
+
+    def run_in_docker(self, image: str, workdir: Path, data_dir: Path) -> dict:
+        """
+        Ejecuta el script naive dentro del contenedor.
+        Monta:
+          - workdir -> /workspace
+          - data    -> /data
+        Llama: python /app/tools/naive_fix.py /workspace /data/findings.json /workspace/stdout.log /workspace/changelog.md
+        """
+        # Normaliza rutas absolutas (Windows friendly)
+        wabs = str(workdir.resolve())
+        dabs = str(data_dir.resolve())
+
+        cmd = [
+            "docker", "run", "--rm",
+            "-v", f"{wabs}:/workspace",
+            "-v", f"{dabs}:/data",
+            image,
+            "bash", "-lc",
+            "python /app/tools/naive_fix.py /workspace /data/findings.json /workspace/stdout.log /workspace/changelog.md"
+        ]
+        try:
+            proc = subprocess.run(cmd, capture_output=True, text=True, env=os.environ.copy())
+            out = (self.workdir/"stdout.log").read_text(encoding="utf-8") if (self.workdir/"stdout.log").exists() else ""
+            return {
+                "status": "DOCKER_OK" if proc.returncode == 0 else "DOCKER_ERROR",
+                "code": proc.returncode,
+                "docker_stdout": proc.stdout[-500:],
+                "docker_stderr": proc.stderr[-500:],
+                "agent_stdout": out[-500:]
+            }
+        except FileNotFoundError:
+            return {"status": "DOCKER_NOT_FOUND", "hint": "Instala Docker Desktop o agrega 'docker' al PATH."}

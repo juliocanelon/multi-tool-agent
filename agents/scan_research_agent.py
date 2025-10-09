@@ -84,3 +84,9 @@ class ScanResearchAgent:
             lines.append(f"- [{fx.severity}] {fx.rule} — {fx.file}:{fx.line} — {fx.summary}")
         lines += ["", "## Tareas", "1) Corregir hallazgos listados.", "2) Generar breve changelog."]
         return "\n".join(lines)
+    
+    def dump_findings_json(self, findings: list[Finding], out_path):
+        import json
+        data = [dict(file=f.file, line=f.line, rule=f.rule, severity=f.severity, summary=f.summary) for f in findings]
+        Path(out_path).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+

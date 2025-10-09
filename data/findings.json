@@ -1,0 +1,51 @@
+[
+  {
+    "file": "src/main/java/com/example/vulnerableapp/VulnerableServlet.java",
+    "line": 111,
+    "rule": "Sql_Injection",
+    "severity": "HIGH",
+    "summary": "SQL Injection due to string concatenation in query"
+  },
+  {
+    "file": "src/main/java/com/example/vulnerableapp/VulnerableServlet.java",
+    "line": 131,
+    "rule": "Reflected_XSS",
+    "severity": "HIGH",
+    "summary": "Reflected XSS in 'name' parameter"
+  },
+  {
+    "file": "src/main/java/com/example/vulnerableapp/VulnerableServlet.java",
+    "line": 163,
+    "rule": "Stored_XSS",
+    "severity": "HIGH",
+    "summary": "Stored XSS in 'comment' parameter insertion"
+  },
+  {
+    "file": "src/main/java/com/example/vulnerableapp/VulnerableServlet.java",
+    "line": 177,
+    "rule": "Path_Traversal",
+    "severity": "HIGH",
+    "summary": "Path Traversal vulnerability in file access"
+  },
+  {
+    "file": "src/main/java/com/example/vulnerableapp/VulnerableServlet.java",
+    "line": 202,
+    "rule": "SSRF",
+    "severity": "HIGH",
+    "summary": "Server-Side Request Forgery via 'url' parameter"
+  },
+  {
+    "file": "src/main/java/com/example/vulnerableapp/VulnerableServlet.java",
+    "line": 225,
+    "rule": "Log_Forging",
+    "severity": "HIGH",
+    "summary": "Log Forging with unsanitized 'username' parameter"
+  },
+  {
+    "file": "src/main/java/com/example/vulnerableapp/SafeFileHandler.java",
+    "line": 36,
+    "rule": "Path_Traversal",
+    "severity": "HIGH",
+    "summary": "Path Traversal due to user-controlled filename"
+  }
+]
