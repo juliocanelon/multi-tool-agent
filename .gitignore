@@ -1,0 +1,57 @@
+# --- Entorno Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos compilados con sufijos extra (como -313.pyc)
+*-[0-9]*.pyc
+
+# Entornos virtuales
+.venv/
+venv/
+ENV/
+env/
+
+# Configuración local
+*.env
+.env.*
+*.local
+instance/
+config/*.local.*
+
+# Archivos temporales
+*.log
+*.tmp
+*.bak
+*.swp
+.DS_Store
+
+# Directorios de trabajo o datos
+data/
+workdir/
+cache/
+__pypackages__/
+
+# Salidas de compilación o distribución
+build/
+dist/
+*.egg-info/
+*.egg
+
+# --- Archivos y configuraciones del ADK ---
+# (no versionar assets temporales, sesiones o cachés del framework)
+.adk/
+.adk_sessions/
+.adk_cache/
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.iml
+
+# --- Docker ---
+docker-compose.override.yml
+*.pid
+
+# --- Archivos del sistema ---
+Thumbs.db
