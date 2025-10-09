@@ -1,0 +1,8 @@
+project_name,scan_id,file_path,line_number,vulnerability_type,cwe_id,description
+vulnerable-java-app,scan-001,src/main/java/com/example/vulnerableapp/VulnerableServlet.java,111,Sql_Injection,89,"SQL Injection due to string concatenation in query"
+vulnerable-java-app,scan-001,src/main/java/com/example/vulnerableapp/VulnerableServlet.java,131,Reflected_XSS,79,"Reflected XSS in 'name' parameter"
+vulnerable-java-app,scan-001,src/main/java/com/example/vulnerableapp/VulnerableServlet.java,163,Stored_XSS,79,"Stored XSS in 'comment' parameter insertion"
+vulnerable-java-app,scan-001,src/main/java/com/example/vulnerableapp/VulnerableServlet.java,177,Path_Traversal,22,"Path Traversal vulnerability in file access"
+vulnerable-java-app,scan-001,src/main/java/com/example/vulnerableapp/VulnerableServlet.java,202,SSRF,918,"Server-Side Request Forgery via 'url' parameter"
+vulnerable-java-app,scan-001,src/main/java/com/example/vulnerableapp/VulnerableServlet.java,225,Log_Forging,117,"Log Forging with unsanitized 'username' parameter"
+vulnerable-java-app,scan-001,src/main/java/com/example/vulnerableapp/SafeFileHandler.java,36,Path_Traversal,22,"Path Traversal due to user-controlled filename"
