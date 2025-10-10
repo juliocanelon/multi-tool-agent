@@ -1,14 +1,13 @@
 from pathlib import Path
-from agents.orchestrator import Orchestrator
-import json, sys
+from multi_tool_agent.agents.orchestrator import Orchestrator
+import json
+import sys
 
-BASE = Path(__file__).resolve().parent
+BASE = Path(__file__).resolve().parent / "multi_tool_agent"
 _orch = Orchestrator(BASE)
 
 def app():
-    """
-    Entry-point para ADK Web: retorna un objeto con método handle(str)->dict.
-    """
+    """Entry-point para ADK Web: retorna un objeto con método handle(str)->dict."""
     return _orch
 
 if __name__ == "__main__":
