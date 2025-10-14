@@ -65,7 +65,7 @@ class Orchestrator:
 
         ver = self.verifyer.verify()
         return {
-            "intention": intent.model_dump(),
+            "intention": intent.to_dict(),
             "repo": repo_log,
             "fix": fix,
             "verify": ver,
