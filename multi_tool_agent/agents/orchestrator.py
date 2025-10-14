@@ -1,6 +1,19 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+
+try:
+    from dotenv import load_dotenv  # type: ignore
+except ModuleNotFoundError:  # pragma: no cover - fallback for minimal environments
+    def load_dotenv(env_path: Path) -> None:
+        """Minimal .env loader used when python-dotenv is unavailable."""
+        if not env_path.exists():
+            return
+        for line in env_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip())
 
 from .intention_agent import IntentionAgent
 from .scan_research_agent import ScanResearchAgent
@@ -10,10 +23,13 @@ from .repo_agent import RepoAgent
 
 class Orchestrator:
     def __init__(self, base_dir:Path):
-        load_dotenv(base_dir/".env")
+        load_dotenv(base_dir / ".env")
         self.base_dir = base_dir
         self.data_dir = base_dir / "data"
-        self.workdir  = base_dir / "workdir"
+        self.workdir = base_dir / "workdir"
+
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.workdir.mkdir(parents=True, exist_ok=True)
 
         self.intention = IntentionAgent()
         self.research  = ScanResearchAgent(self.data_dir)
@@ -49,7 +65,7 @@ class Orchestrator:
 
         ver = self.verifyer.verify()
         return {
-            "intention": intent.model_dump(),
+            "intention": intent.to_dict(),
             "repo": repo_log,
             "fix": fix,
             "verify": ver,

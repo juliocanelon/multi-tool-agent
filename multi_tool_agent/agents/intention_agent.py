@@ -1,15 +1,24 @@
 import re
-from pydantic import BaseModel
+from dataclasses import dataclass, asdict
 from typing import List, Literal, Optional
 
 Severity = Literal["CRITICAL","HIGH","MEDIUM","LOW"]
 
-class Intention(BaseModel):
+
+@dataclass
+class Intention:
     checkmarx_project_id: Optional[str] = ""
     repo_url: Optional[str] = ""
     branch: Optional[str] = ""
-    severity_to_fix: List[Severity] = []
+    severity_to_fix: List[Severity] = None
     notes: Optional[str] = ""
+
+    def to_dict(self) -> dict:
+        data = asdict(self)
+        # Normaliza listas None -> [] para evitar sorpresas aguas abajo
+        if data.get("severity_to_fix") is None:
+            data["severity_to_fix"] = []
+        return data
 
 SEV_MAP = {"CRITICAL","HIGH","MEDIUM","LOW","CRITICAS","ALTAS","MEDIAS","BAJAS"}
 
