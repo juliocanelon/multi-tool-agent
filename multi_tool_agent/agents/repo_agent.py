@@ -1,5 +1,6 @@
-import os, subprocess, shlex
+import os, subprocess, shlex, datetime
 from pathlib import Path
+
 
 def _run(cmd: str, cwd: Path) -> tuple[int, str]:
     proc = subprocess.run(shlex.split(cmd), cwd=cwd, capture_output=True, text=True)
@@ -72,3 +73,41 @@ class RepoAgent:
             code, out3 = _run(f"git reset --hard origin/{branch}", self.workdir)
             if code != 0: return {"ok": False, "step": "git reset", "log": out3}
             return {"ok": True, "step": "updated", "branch": branch}
+
+    def current_branch(self) -> str:
+        code, out = _run("git rev-parse --abbrev-ref HEAD", self.workdir)
+        return out.strip() if code == 0 else ""
+
+    def create_feature_branch(self, base_branch: str) -> dict:
+        ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        feat = f"fix/ai-{ts}"
+        code, out = _run(f"git checkout -B {feat} {base_branch}", self.workdir)
+        return {"ok": code == 0, "branch": feat, "log": out}
+
+    def commit_all(self, message: str, author_name: str, author_email: str) -> dict:
+        _run(f'git config user.name "{author_name}"', self.workdir)
+        _run(f'git config user.email "{author_email}"', self.workdir)
+        code_add, out_add = _run("git add -A", self.workdir)
+        if code_add != 0:
+            return {"ok": False, "step": "git add", "log": out_add}
+        code_st, out_st = _run("git diff --cached --name-only", self.workdir)
+        if not out_st.strip():
+            return {"ok": True, "step": "nothing_to_commit", "log": out_st}
+        code_c, out_c = _run(f'git commit -m "{message}"', self.workdir)
+        return {"ok": code_c == 0, "step": "git commit", "log": out_c}
+
+    def push_branch(self, branch: str, remote: str = "origin") -> dict:
+        mode = (os.getenv("GIT_AUTH_MODE") or "HTTPS").upper()
+        if mode == "HTTPS":
+            user = os.getenv("GIT_USERNAME", "").strip()
+            token = os.getenv("GIT_TOKEN", "").strip()
+            if user and token:
+                code_url, out_url = _run(f"git remote get-url {remote}", self.workdir)
+                if code_url == 0:
+                    current = out_url.strip()
+                    authed = self._url_with_auth(current)
+                    if authed != current:
+                        _run(f"git remote set-url {remote} {authed}", self.workdir)
+
+        code, out = _run(f"git push {remote} {branch}:{branch}", self.workdir)
+        return {"ok": code == 0, "step": "git push", "log": out}
